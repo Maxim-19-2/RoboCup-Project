@@ -13,7 +13,8 @@ def main():
 	motion = ALProxy("ALMotion", IP, PORT)
 	posture = ALProxy("ALRobotPosture", IP, PORT)
 	tracker = ALProxy("ALTracker", IP, PORT)
-	navigation = ALProxy("ALNavigation",IP,PORT)
+	tts = ALProxy("ALTextToSpeech", IP, PORT)
+
 
 	# First, wake up.
 	motion.wakeUp()
@@ -41,22 +42,29 @@ def main():
 	print "Use Ctrl+c to stop this script."
 
 
-	if(not tracker.isTargetLost()):
-		print "."		# set effector
-		
-
+	picount=0
 	try:
 		while True:
-			if(tracker.isTargetLost()):
+			if(tracker.isTargetLost()):           #remove efefctor to lower arm while searching
+				tts.say("cant find the Ball!")
+				tracker.setEffector("None")
 				posture.goToPosture("StandInit", fractionMaxSpeed)
 				motion.moveTo(0,0,(math.pi/3))
-			time.sleep(1)
+				picount+=1
+			if(not tracker.isTargetLost()):	
+				tracker.setEffector(effector)		# set effector to pint at ball
+			if(picount=6):
+				motion.moveTo(0,0,(-math.pi)) 		#turn robot back to orignal positon so he wont die because of the cables
+				motion.moveTo(0,0,(-math.pi))
+				picount=0
+			time.sleep(0.5)
 	except KeyboardInterrupt:
 		print "..."
 		print "Interrupted by user"
 		print "Stopping..."
 
-	# Stop tracker, go to posture Sit.
+	# Stop tracker, go to posture Crouch.
+	tts.say("Going to Sleep!")
 	tracker.stopTracker()
 	tracker.unregisterAllTargets()
 	tracker.setEffector("None")
