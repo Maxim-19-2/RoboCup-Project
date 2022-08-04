@@ -53,7 +53,7 @@ def main():
 				picount+=1
 			if(not tracker.isTargetLost()):	
 				tracker.setEffector(effector)		# set effector to pint at ball
-			if(picount=6):
+			if(picount==6):
 				motion.moveTo(0,0,(-math.pi)) 		#turn robot back to orignal positon so he wont die because of the cables
 				motion.moveTo(0,0,(-math.pi))
 				picount=0
